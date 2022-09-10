@@ -98,37 +98,36 @@ public class Images {
     int x2,
     int y2
   ) {
-
     final float m = (y2 - y1) * 1f / (x2 - x1) * 1f;
 
     if (y1 < y2){
       // bottom half
       if (1 >= m && m >= 0) {
-        // octane 1
+        // octant 1
         draw(x1, y1, x2, y2, false, false, false);
       } else if (Integer.MAX_VALUE >= m && m >= 1) {
-        // octane 2
+        // octant 2
         draw(y1, x1, y2, x2, true, false, false);
       } else if (-1 >= m && m >= Integer.MIN_VALUE) {
-        // octane 3
+        // octant 3
         draw(y1, x1, y2, x2, true, false, true);
       } else if (0 >= m && m >= -1) {
-        // octane 4
+        // octant 4
         draw(x1, y1, x2, y2, false, true, true);
       }
     } else {
       // upper half
       if (1 >= m && m >= 0) {
-        // octane 5
+        // octant 5
         draw(x1, y1, x2, y2, false, true, false);
       } else if (Integer.MAX_VALUE >= m && m >= 1) {
         // octane 6
         draw(y1, x1, y2, x2, true, true, false);
       } else if (-1 >= m && m >= Integer.MIN_VALUE) {
-        // octane 7
+        // octant 7
         draw(y1, x1, y2, x2, true, true, true);
       } else if (0 >= m && m >= -1) {
-        // octane 8
+        // octant 8
         draw(x1, y1, x2, y2, false, false, true);
       }
     }
