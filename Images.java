@@ -5,7 +5,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import javax.xml.transform.Templates;
 
 public class Images {
 
@@ -53,7 +52,6 @@ public class Images {
         @Override
         public void mouseClicked(MouseEvent e) {
           if (e.getButton() == MouseEvent.BUTTON1) {
-            System.out.println(e.getX() + " " + e.getY());
             if (x1 == Integer.MAX_VALUE) {
               x1 = e.getX();
               y1 = e.getY();
@@ -100,65 +98,68 @@ public class Images {
     int x2,
     int y2
   ) {
-    
-    // octant 1 WORKING
-    // draw(x1, y1, x2, y2, 1);
 
-    // octant 2 WORKING
-    draw(y1, x1, y2, x2, 2);
+    final float m = (y2 - y1) * 1f / (x2 - x1) * 1f;
 
-    // octant 4 NOT WORKING
-
-    // octant 5 WORKING
-    // draw(x1, y1, x2, y2, 5);
-
-    // octant 6
-    // draw(y1, x1, y2, x2, 6);
-    // int x = x2;
-    // int y = y2;
-    // int dx = x1 - x2;
-    // int dy = y1 - y2;
-    // int d = 2 * dy - dx;
-
-    // while (x < x1) {
-    //     if (d >= 0) {
-    //         y = y + 1;
-    //         d = d + 2 * (dy - dx);
-    //     } else {
-    //         d = d + 2 * dy;
-    //     }
-    //     x = x + 1;
-    //     drawPixel(x, y);
-    // }
+    if (y1 < y2){
+      // bottom half
+      if (1 >= m && m >= 0) {
+        // octane 1
+        draw(x1, y1, x2, y2, false, false, false);
+      } else if (Integer.MAX_VALUE >= m && m >= 1) {
+        // octane 2
+        draw(y1, x1, y2, x2, true, false, false);
+      } else if (-1 >= m && m >= Integer.MIN_VALUE) {
+        // octane 3
+        draw(y1, x1, y2, x2, true, false, true);
+      } else if (0 >= m && m >= -1) {
+        // octane 4
+        draw(x1, y1, x2, y2, false, true, true);
+      }
+    } else {
+      // upper half
+      if (1 >= m && m >= 0) {
+        // octane 5
+        draw(x1, y1, x2, y2, false, true, false);
+      } else if (Integer.MAX_VALUE >= m && m >= 1) {
+        // octane 6
+        draw(y1, x1, y2, x2, true, true, false);
+      } else if (-1 >= m && m >= Integer.MIN_VALUE) {
+        // octane 7
+        draw(y1, x1, y2, x2, true, true, true);
+      } else if (0 >= m && m >= -1) {
+        // octane 8
+        draw(x1, y1, x2, y2, false, false, true);
+      }
+    }
   }
 
-  private static void draw (int x1, int y1, int x2, int y2, int octant) {
-    int dx = Math.abs(x2 - x1);
-    int dy = Math.abs(y2 - y1);
-    int d = 2 * dy - dx;
-    // p0 -> p1
+  private static void draw (int x1, int y1, int x2, int y2, boolean swaped, boolean reverse, boolean decrement) {
+    final int dx = Math.abs(x2 - x1);
+    final int dy = Math.abs(y2 - y1);
+    final int endX = reverse ? x1 : x2;
 
-    int x = octant == 4 || octant == 5 || octant == 6 ? x2 : x1;
-    int y = octant == 4 || octant == 5 || octant == 6 ? y2 : x1;
-    int endX = octant == 4 || octant == 5 || octant == 6 ? x1 : x2;
+    int x = reverse ? x2 : x1;
+    int y = reverse ? y2 : y1;
+    int d = 2 * dy - dx;
 
     while (x < endX) {
-        if (d >= 0) {
-          y = y + 1;
-          d = d + 2 * (dy - dx);
-        } else {
+        if (d <= 0) {
+          // E
           d = d + 2 * dy;
-        }
+        } else {
+          // NE
+          d = d + 2 * (dy - dx);
+          y = y + (decrement ? -1 : 1);
+        } 
         x = x + 1;
 
-        if (octant == 2 || octant == 3 || octant == 7) drawPixel(y, x);
-        else drawPixel(x, y);
+        drawPixel(swaped ? y : x, swaped ? x : y);
       }
   }
 
   private static BufferedImage img;
   private static int[] pixel = { 255, 255, 255 };
-
   public static void drawPixel(int x, int y) {
     img.getRaster().setPixel(x, y, pixel);
   }
