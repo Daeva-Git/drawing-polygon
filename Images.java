@@ -104,36 +104,36 @@ public class Images {
       // bottom half
       if (1 >= m && m >= 0) {
         // octant 1
-        draw(x1, y1, x2, y2, false, false, false);
+        drawLineInOctant(x1, y1, x2, y2, false, false, false);
       } else if (Integer.MAX_VALUE >= m && m >= 1) {
         // octant 2
-        draw(y1, x1, y2, x2, true, false, false);
+        drawLineInOctant(y1, x1, y2, x2, true, false, false);
       } else if (-1 >= m && m >= Integer.MIN_VALUE) {
         // octant 3
-        draw(y1, x1, y2, x2, true, false, true);
+        drawLineInOctant(y1, x1, y2, x2, true, false, true);
       } else if (0 >= m && m >= -1) {
         // octant 4
-        draw(x1, y1, x2, y2, false, true, true);
+        drawLineInOctant(x1, y1, x2, y2, false, true, true);
       }
     } else {
       // upper half
       if (1 >= m && m >= 0) {
         // octant 5
-        draw(x1, y1, x2, y2, false, true, false);
+        drawLineInOctant(x1, y1, x2, y2, false, true, false);
       } else if (Integer.MAX_VALUE >= m && m >= 1) {
         // octane 6
-        draw(y1, x1, y2, x2, true, true, false);
+        drawLineInOctant(y1, x1, y2, x2, true, true, false);
       } else if (-1 >= m && m >= Integer.MIN_VALUE) {
         // octant 7
-        draw(y1, x1, y2, x2, true, true, true);
+        drawLineInOctant(y1, x1, y2, x2, true, true, true);
       } else if (0 >= m && m >= -1) {
         // octant 8
-        draw(x1, y1, x2, y2, false, false, true);
+        drawLineInOctant(x1, y1, x2, y2, false, false, true);
       }
     }
   }
 
-  private static void draw (int x1, int y1, int x2, int y2, boolean swaped, boolean reverse, boolean decrement) {
+  private static void drawLineInOctant (int x1, int y1, int x2, int y2, boolean swaped, boolean reverse, boolean decrement) {
     final int dx = Math.abs(x2 - x1);
     final int dy = Math.abs(y2 - y1);
     final int endX = reverse ? x1 : x2;
