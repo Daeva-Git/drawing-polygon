@@ -61,7 +61,7 @@ public class Images {
               x2 = e.getX();
               y2 = e.getY();
 
-              drawLine(img, x1, y1, x2, y2);
+              drawLine(x1, y1, x2, y2);
 
               x1 = Integer.MAX_VALUE;
               y1 = Integer.MAX_VALUE;
@@ -92,23 +92,23 @@ public class Images {
   }
 
   public static void drawLine(
-    BufferedImage img,
     int x1,
     int y1,
     int x2,
     int y2
   ) {
-    final float m = (y2 - y1) * 1f / (x2 - x1) * 1f;
+    float m = (y2 - y1) * 1f / (x2 - x1) * 1f;
+    if (Float.isNaN(m)) m = 0;
 
-    if (y1 < y2){
+    if (y1 < y2) {
       // bottom half
       if (1 >= m && m >= 0) {
         // octant 1
         drawLineInOctant(x1, y1, x2, y2, false, false, false);
-      } else if (Integer.MAX_VALUE >= m && m >= 1) {
+      } else if (Float.POSITIVE_INFINITY >= m && m >= 1) {
         // octant 2
         drawLineInOctant(y1, x1, y2, x2, true, false, false);
-      } else if (-1 >= m && m >= Integer.MIN_VALUE) {
+      } else if (-1 >= m && m >= Float.NEGATIVE_INFINITY) {
         // octant 3
         drawLineInOctant(y1, x1, y2, x2, true, false, true);
       } else if (0 >= m && m >= -1) {
@@ -117,13 +117,13 @@ public class Images {
       }
     } else {
       // upper half
-      if (1 >= m && m >= 0) {
+      if (1 >= m && m >= 0 && x1 > x2) {
         // octant 5
         drawLineInOctant(x1, y1, x2, y2, false, true, false);
-      } else if (Integer.MAX_VALUE >= m && m >= 1) {
+      } else if (Float.POSITIVE_INFINITY >= m && m >= 1) {
         // octane 6
         drawLineInOctant(y1, x1, y2, x2, true, true, false);
-      } else if (-1 >= m && m >= Integer.MIN_VALUE) {
+      } else if (-1 >= m && m >= Float.NEGATIVE_INFINITY) {
         // octant 7
         drawLineInOctant(y1, x1, y2, x2, true, true, true);
       } else if (0 >= m && m >= -1) {
