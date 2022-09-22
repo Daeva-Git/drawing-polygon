@@ -1,2 +1,1 @@
-Simple Brasenham's line drawing algotihm
-With polygon transformation
+Simple Brasenham's line drawing algotihm with polygon transformation
