@@ -1,43 +1,31 @@
 public class Matrix {
-    // Function to multiply
-    // two matrices A[][] and B[][]
-    public static float[][] multiplyMatrix(float[][] A, float[][] B) {
-        final int row1 = A.length;
-        final int col1 = A[0].length;
+    
+    public static float[][] matrixMultiplication(float[][] m1, float[][] m2) {
+        final int firstMatrixRow = m1.length;
+        final int firstMatrixCol = m1[0].length;
 
-        final int row2 = B.length;
-        final int col2 = B[0].length;
+        final int secondMatrixRow = m2.length;
+        final int secondMatrixCol = m2[0].length;
 
-        // Check if multiplication is Possible
-        if (row2 != col1)
+        // check if the matrix sizes match
+        if (secondMatrixRow != firstMatrixCol)
             return null;
 
-        // Matrix to store the result
-        // The product matrix will
-        // be of size row1 x col2
-        final float C[][] = new float[row1][col2];
+        // create a new matrix
+        final float newMatrix[][] = new float[firstMatrixRow][secondMatrixCol];
 
-        // Multiply the two matrices
-        for (int i = 0; i < row1; i++) {
-            for (int j = 0; j < col2; j++) {
-                for (int k = 0; k < row2; k++) {
-                    C[i][j] += A[i][k] * B[k][j];
+        // iterate over the rows
+        for (int row = 0; row < firstMatrixRow; row++) {
+            // iterate over the columns
+            for (int col = 0; col < secondMatrixCol; col++) {
+                // compute the dot product and set it in the new matrix
+                for (int k = 0; k < secondMatrixRow; k++) {
+                    newMatrix[row][col] += m1[row][k] * m2[k][col];
                 }
             }
         }
-        printMatrix(C);
-        return C;
-    }
 
-    public static void printMatrix(float matrix[][]) {
-        final int rows = matrix.length;
-        final int cols = matrix[0].length;
-
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                System.out.print(matrix[row][col] + " ");
-            }
-            System.out.println();
-        }
+        // return the new matrix
+        return newMatrix;
     }
 }
