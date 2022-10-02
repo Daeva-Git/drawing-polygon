@@ -33,6 +33,20 @@ public class Demo {
         return img;
     }
 
+    public static void pipeline(Cube cube, Camera camera, BufferedImage image) {
+        // transformation matrix = projectionMatrix x viewMatrix x worldMatrix
+        // create a new cube
+        // iterate over all its polygones
+        // iterate over all their points
+        // multiply them with the transformation matrix
+        // perform the W division
+        // perform the viewport transformation
+
+        
+        // draw the cube
+        cube.draw(image);
+    }
+
     public static void main(String... args) {
         // create new frame
         final Frame w = new Frame("Raster");
@@ -54,103 +68,136 @@ public class Demo {
         // draw the image
         g.drawImage(image, 0, 0, (img1, infoflags, x, y, width, height) -> false);
 
-        // create new polygone
-        final Polygon polygon = new Polygon();
+        // create a new cube
+        final Cube cube = new Cube();
 
+        // scale and translate to take the cube to its initial position in the world
+        // space
+
+        // create a new camera
+        final Camera camera = new Camera();
+
+        // translate to take the camera to its initial position in the world space
+        // TODO: 
+
+        // call the pipeline method
+        pipeline(cube, camera, image);
+
+        // draw the image
+        g.drawImage(image, 0, 0, (img1, infoflags, x, y, width, height) -> false);
+
+        // old
         // mouseListener
-        w.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                // mouseClicked
-                if (SwingUtilities.isLeftMouseButton(e)) {
-                    // in case of a left click add point
-                    polygon.addPoint(new Point(e.getX(), e.getY()));
+        // w.addMouseListener(new MouseAdapter() {
+        // @Override
+        // public void mouseClicked(MouseEvent e) {
+        // // mouseClicked
+        // if (SwingUtilities.isLeftMouseButton(e)) {
+        // // in case of a left click add point
+        // polygon.addPoint(new Point(e.getX(), e.getY()));
 
-                    // drawOpen (draw a polyline)
-                    polygon.drawOpen(image);
+        // // drawOpen (draw a polyline)
+        // polygon.drawOpen(image);
 
-                    // draw image
-                    g.drawImage(image, 0, 0, (img1, infoflags, x, y, width, height) -> false);
-                } else if (SwingUtilities.isRightMouseButton(e)) {
-                    // in case of a right click
+        // // draw image
+        // g.drawImage(image, 0, 0, (img1, infoflags, x, y, width, height) -> false);
+        // } else if (SwingUtilities.isRightMouseButton(e)) {
+        // // in case of a right click
 
-                    // drawClosed (draw a polyline)
-                    polygon.drawClosed(image);
+        // // drawClosed (draw a polyline)
+        // polygon.drawClosed(image);
 
-                    // draw the image
-                    g.drawImage(image, 0, 0, (img1, infoflags, x, y, width, height) -> false);
-                }
-            }
-        });
+        // // draw the image
+        // g.drawImage(image, 0, 0, (img1, infoflags, x, y, width, height) -> false);
+        // }
+        // }
+        // });
 
         // keyListener
-        w.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                // do nothing
-            }
+        // w.addKeyListener(new KeyListener() {
+        // @Override
+        // public void keyTyped(KeyEvent e) {
+        // // do nothing
+        // }
 
-            @Override
-            public void keyPressed(KeyEvent e) {
-                // keyPressed
-                final int keyCode = e.getKeyCode();
-                switch (keyCode) {
-                    // polygon movement
-                    case KeyEvent.VK_LEFT:
-                        // translate left
-                        polygon.translate(-5, 0);
-                        break;
-                    case KeyEvent.VK_RIGHT:
-                        // translate right
-                        polygon.translate(5, 0);
-                        break;
-                    case KeyEvent.VK_UP:
-                        // translate up
-                        polygon.translate(0, -5);
-                        break;
-                    case KeyEvent.VK_DOWN:
-                        // translate down
-                        polygon.translate(0, 5);
-                        break;
+        // @Override
+        // public void keyPressed(KeyEvent e) {
+        // // keyPressed
+        // final int keyCode = e.getKeyCode();
+        // switch (keyCode) {
+        // // polygon movement
+        // case KeyEvent.VK_LEFT:
+        // // translate left
+        // polygon.translate(-5, 0);
+        // break;
+        // case KeyEvent.VK_RIGHT:
+        // // translate right
+        // polygon.translate(5, 0);
+        // break;
+        // case KeyEvent.VK_UP:
+        // // translate up
+        // polygon.translate(0, -5);
+        // break;
+        // case KeyEvent.VK_DOWN:
+        // // translate down
+        // polygon.translate(0, 5);
+        // break;
 
-                    // polygon rotation
-                    case KeyEvent.VK_R:
-                        // rotate left
-                        polygon.rotate(-5);
-                        break;
-                    case KeyEvent.VK_T:
-                        // rotate right
-                        polygon.rotate(5);
-                        break;
+        // // polygon rotation
+        // case KeyEvent.VK_R:
+        // // rotate left
+        // polygon.rotate(-5);
+        // break;
+        // case KeyEvent.VK_T:
+        // // rotate right
+        // polygon.rotate(5);
+        // break;
 
-                    // polygon scaling
-                    case KeyEvent.VK_D:
-                        // scale down
-                        polygon.scale(1.1f, 1.1f);
-                        break;
-                    case KeyEvent.VK_S:
-                        // scale up
-                        polygon.scale(0.9f, 0.9f);
-                        break;
-                    default:
-                        // do nothing
-                        break;
-                }
+        // // polygon scaling
+        // case KeyEvent.VK_D:
+        // // scale down
+        // polygon.scale(1.1f, 1.1f);
+        // break;
+        // case KeyEvent.VK_S:
+        // // scale up
+        // polygon.scale(0.9f, 0.9f);
+        // break;
+        // default:
+        // // do nothing
+        // break;
+        // }
 
-                // reset
-                solidSetRaster(image);
-                polygon.drawOpen(image);
-                polygon.drawClosed(image);
+        // // reset
+        // solidSetRaster(image);
+        // polygon.drawOpen(image);
+        // polygon.drawClosed(image);
 
-                // draw the image
-                g.drawImage(image, 0, 0, (img1, infoflags, x, y, width, height) -> false);
-            }
+        // // draw the image
+        // g.drawImage(image, 0, 0, (img1, infoflags, x, y, width, height) -> false);
+        // }
 
-            @Override
-            public void keyReleased(KeyEvent e) {
-                // do nothing
-            }
-        });
+        // @Override
+        // public void keyReleased(KeyEvent e) {
+        // // do nothing
+        // }
+        // });
+
+        // newwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+        // keyListener
+        // keyPressed
+        // rotate the cube CCW around the y axis using R key
+        // rotate the cube CW around the y axis using T key
+        // decrease the FOV using F key
+        // increase the FOV using G key
+        // translate the camera forward using W key
+        // translate the camera backward using S key
+        // translate the camera left using A key
+        // translate the camera right using D key
+        // translate the camera up using E key
+        // translate the camera down using Q key
+        //
+        // call the pipeline method
+        // draw the image
 
         // windowListener
         w.addWindowListener(new WindowAdapter() {
