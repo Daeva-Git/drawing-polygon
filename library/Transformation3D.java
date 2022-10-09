@@ -22,9 +22,9 @@ public class Transformation3D {
 
         // create and return a rotation matrix that rotates the object around the y axis
         final float[][] rotationMatrix = {
-                { 1, 0, 0, 0 },
-                { 0, cos, -sin, 0 },
-                { 0, sin, cos, 0 },
+                { cos, 0, sin, 0 },
+                { 0, 1, 0, 0 },
+                { -sin, 0, cos, 0 },
                 { 0, 0, 0, 1 }
         };
         return rotationMatrix;

@@ -1,14 +1,10 @@
 import java.awt.*;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-
-import javax.swing.SwingUtilities;
-
+import library.Matrix;
 import java.awt.event.KeyEvent;
 
 public class Demo {
@@ -35,16 +31,35 @@ public class Demo {
 
     public static void pipeline(Cube cube, Camera camera, BufferedImage image) {
         // transformation matrix = projectionMatrix x viewMatrix x worldMatrix
-        // create a new cube
-        // iterate over all its polygones
-        // iterate over all their points
-        // multiply them with the transformation matrix
-        // perform the W division
-        // perform the viewport transformation
+        final float[][] projectionMatrix = camera.getProjectionMatrix();
+        final float[][] viewMatrix = camera.getViewMatrix();
+        final float[][] worldMatrix = cube.getWorldMatrix();
+        final float[][] transformationMatrix = Matrix.matrixMultiplication(projectionMatrix,
+                Matrix.matrixMultiplication(viewMatrix, worldMatrix));
 
-        
+        // create a new cube
+        final Cube newCube = new Cube();
+
+        // iterate over all its polygones
+        for (Polygon polygon : newCube.getPolygons()) {
+            // iterate over all their points
+            for (Point point : polygon.getPoints()) {
+                // multiply them with the transformation matrix
+                point.setPointMatrix(Matrix.matrixMultiplication(transformationMatrix, point.getPointMatrix()));
+
+                // perform the W division
+                point.setX(point.getX() / -point.getW());
+                point.setY(point.getY() / -point.getW());
+                point.setZ(point.getZ() / -point.getW());
+
+                // perform the viewport transformation
+                point.setX((point.getX() + 1) * camera.getWidth() / 2.0f);
+                point.setY((point.getY() + 1) * camera.getHeight() / 2.0f);
+            }
+        }
+
         // draw the cube
-        cube.draw(image);
+        newCube.draw(image);
     }
 
     public static void main(String... args) {
@@ -73,12 +88,14 @@ public class Demo {
 
         // scale and translate to take the cube to its initial position in the world
         // space
+        cube.scale(2.0f, 2.0f, 2.0f);
+        cube.translate(0.0f, 0.0f, -5.0f);
 
         // create a new camera
-        final Camera camera = new Camera();
+        final Camera camera = new Camera(90.0f, imageWidth, imageHeight, 1.0f, 5.0f);
 
         // translate to take the camera to its initial position in the world space
-        // TODO: 
+        camera.translateCamera(0.0f, 0.0f, 0.0f);
 
         // call the pipeline method
         pipeline(cube, camera, image);
@@ -86,118 +103,83 @@ public class Demo {
         // draw the image
         g.drawImage(image, 0, 0, (img1, infoflags, x, y, width, height) -> false);
 
-        // old
-        // mouseListener
-        // w.addMouseListener(new MouseAdapter() {
-        // @Override
-        // public void mouseClicked(MouseEvent e) {
-        // // mouseClicked
-        // if (SwingUtilities.isLeftMouseButton(e)) {
-        // // in case of a left click add point
-        // polygon.addPoint(new Point(e.getX(), e.getY()));
-
-        // // drawOpen (draw a polyline)
-        // polygon.drawOpen(image);
-
-        // // draw image
-        // g.drawImage(image, 0, 0, (img1, infoflags, x, y, width, height) -> false);
-        // } else if (SwingUtilities.isRightMouseButton(e)) {
-        // // in case of a right click
-
-        // // drawClosed (draw a polyline)
-        // polygon.drawClosed(image);
-
-        // // draw the image
-        // g.drawImage(image, 0, 0, (img1, infoflags, x, y, width, height) -> false);
-        // }
-        // }
-        // });
-
         // keyListener
-        // w.addKeyListener(new KeyListener() {
-        // @Override
-        // public void keyTyped(KeyEvent e) {
-        // // do nothing
-        // }
+        w.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                // do nothing
+            }
 
-        // @Override
-        // public void keyPressed(KeyEvent e) {
-        // // keyPressed
-        // final int keyCode = e.getKeyCode();
-        // switch (keyCode) {
-        // // polygon movement
-        // case KeyEvent.VK_LEFT:
-        // // translate left
-        // polygon.translate(-5, 0);
-        // break;
-        // case KeyEvent.VK_RIGHT:
-        // // translate right
-        // polygon.translate(5, 0);
-        // break;
-        // case KeyEvent.VK_UP:
-        // // translate up
-        // polygon.translate(0, -5);
-        // break;
-        // case KeyEvent.VK_DOWN:
-        // // translate down
-        // polygon.translate(0, 5);
-        // break;
+            @Override
+            public void keyPressed(KeyEvent e) {
+                // keyPressed
+                final int keyCode = e.getKeyCode();
+                switch (keyCode) {
+                    // rotation
+                    case KeyEvent.VK_R:
+                        // rotate the cube CCW around the y axis using R key
+                        cube.rotateYOrigin(-1f);
+                        break;
+                    case KeyEvent.VK_T:
+                        // rotate the cube CW around the y axis using T key
+                        cube.rotateYOrigin(1f);
+                        break;
 
-        // // polygon rotation
-        // case KeyEvent.VK_R:
-        // // rotate left
-        // polygon.rotate(-5);
-        // break;
-        // case KeyEvent.VK_T:
-        // // rotate right
-        // polygon.rotate(5);
-        // break;
+                    // FOV
+                    case KeyEvent.VK_G:
+                        // increase the FOV using G key
+                        camera.setTheta(camera.getTheta() + 1.0f);
+                        break;
+                    case KeyEvent.VK_F:
+                        // decrease the FOV using F key
+                        camera.setTheta(camera.getTheta() - 1.0f);
+                        break;
 
-        // // polygon scaling
-        // case KeyEvent.VK_D:
-        // // scale down
-        // polygon.scale(1.1f, 1.1f);
-        // break;
-        // case KeyEvent.VK_S:
-        // // scale up
-        // polygon.scale(0.9f, 0.9f);
-        // break;
-        // default:
-        // // do nothing
-        // break;
-        // }
+                    // camera
+                    case KeyEvent.VK_W:
+                        // translate the camera forward using W key
+                        camera.translateCamera(0.0f, 0.0f, 0.05f);
+                        break;
+                    case KeyEvent.VK_S:
+                        // translate the camera backward using S key
+                        camera.translateCamera(0.0f, 0.0f, -0.05f);
+                        break;
+                    case KeyEvent.VK_A:
+                        // translate the camera left using A key
+                        camera.translateCamera(-0.05f, 0.0f, 0.0f);
+                        break;
+                    case KeyEvent.VK_D:
+                        // translate the camera right using D key
+                        camera.translateCamera(0.05f, 0.0f, 0.0f);
+                        break;
+                    case KeyEvent.VK_E:
+                        // translate the camera up using E key
+                        camera.translateCamera(0.0f, -0.05f, 0.0f);
+                        break;
+                    case KeyEvent.VK_Q:
+                        // translate the camera down using Q key
+                        camera.translateCamera(0.0f, 0.05f, 0.0f);
+                        break;
+                    default:
+                        // do nothing
+                        break;
+                }
 
-        // // reset
-        // solidSetRaster(image);
-        // polygon.drawOpen(image);
-        // polygon.drawClosed(image);
+                // clearf
+                solidSetRaster(image);
 
-        // // draw the image
-        // g.drawImage(image, 0, 0, (img1, infoflags, x, y, width, height) -> false);
-        // }
+                // call the pipeline method
+                pipeline(cube, camera, image);
 
-        // @Override
-        // public void keyReleased(KeyEvent e) {
-        // // do nothing
-        // }
-        // });
+                // draw the image
+                g.drawImage(image, 0, 0, (img1, infoflags, x, y, width, height) -> false);
+            }
 
-        // newwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
-        // keyListener
-        // keyPressed
-        // rotate the cube CCW around the y axis using R key
-        // rotate the cube CW around the y axis using T key
-        // decrease the FOV using F key
-        // increase the FOV using G key
-        // translate the camera forward using W key
-        // translate the camera backward using S key
-        // translate the camera left using A key
-        // translate the camera right using D key
-        // translate the camera up using E key
-        // translate the camera down using Q key
-        //
-        // call the pipeline method
-        // draw the image
+            @Override
+            public void keyReleased(KeyEvent e) {
+                // do nothing
+            }
+        });
 
         // windowListener
         w.addWindowListener(new WindowAdapter() {

@@ -29,4 +29,15 @@ public class Matrix {
         // return the new matrix
         return newMatrix;
     }
+
+    public static void print(float[][] matrix) {
+        for (float[] row : matrix) {
+            String line = "";
+            for (float col : row) {
+                line += col + " ";
+            }
+            System.out.println(line);
+        }
+        System.out.println();
+    }
 }

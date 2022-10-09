@@ -11,12 +11,23 @@ public class Camera {
     private float far;
 
     // viewMatrix, projectionMatrix
-    private float[][] viewMatrix;
+    private float[][] viewMatrix = {
+            { 1, 0, 0, 0 },
+            { 0, 1, 0, 0 },
+            { 0, 0, 1, 0 },
+            { 0, 0, 0, 1 }
+    };
     private float[][] projectionMatrix;
 
     // constructor
-    public Camera() {
+    public Camera(float theta, float width, float height, float near, float far) {
+        this.theta = theta;
+        this.width = width;
+        this.height = height;
+        this.near = near;
+        this.far = far;
 
+        this.projectionMatrix = makeProjectionMatrix(theta, width / height, near, far);
     }
 
     // getters
@@ -51,22 +62,27 @@ public class Camera {
     // setters
     public void setTheta(float theta) {
         this.theta = theta;
+        this.projectionMatrix = makeProjectionMatrix(theta, width / height, near, far);
     }
 
     public void setWidth(float width) {
         this.width = width;
+        this.projectionMatrix = makeProjectionMatrix(theta, width / height, near, far);
     }
 
     public void setHeight(float height) {
         this.height = height;
+        this.projectionMatrix = makeProjectionMatrix(theta, width / height, near, far);
     }
 
     public void setNear(float near) {
         this.near = near;
+        this.projectionMatrix = makeProjectionMatrix(theta, width / height, near, far);
     }
 
     public void setFar(float far) {
         this.far = far;
+        this.projectionMatrix = makeProjectionMatrix(theta, width / height, near, far);
     }
 
     public void setViewMatrix(float[][] viewMatrix) {
@@ -79,16 +95,9 @@ public class Camera {
 
     public float[][] makeProjectionMatrix(float theta, float aspectRatio, float near, float far) {
         final float tangent = (float) Math.tan(Math.toRadians(theta / 2.0f));
-        final float height = near * tangent;
-        final float width = height * aspectRatio;
-        return this.makeProjectionMatrix(-width, width, -height, height, near, far);
-    }
-
-    public float[][] makeProjectionMatrix(float left, float right, float bottom, float top, float near, float far) {
-        // create and return the projection matrix
         final float[][] projectionMatrix = {
-                { 2 * near / (right - left), 0, (right + left) / (right - left), 0 },
-                { 0, 2 * near / (top - bottom), (top + bottom) / (top - bottom), 0 },
+                { 1 / tangent / aspectRatio, 0, 0, 0 },
+                { 0, 1 / tangent, 0, 0 },
                 { 0, 0, -(far + near) / (far - near), -2 * far * near / (far - near) },
                 { 0, 0, -1, 0 }
         };
@@ -100,6 +109,6 @@ public class Camera {
         final float[][] translationMatrix = Transformation3D.getTranslationMatrix(tx, ty, tz);
 
         // update the view matrix
-        this.viewMatrix = Matrix.matrixMultiplication(viewMatrix, translationMatrix);
+        this.viewMatrix = Matrix.matrixMultiplication(translationMatrix, viewMatrix);
     }
 }
